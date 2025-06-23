@@ -85,7 +85,7 @@ const TaskManager = () => {
                     alt="Task Icon" 
                     style={{ width: '82px', height: '82px' }} 
                 />
-                Task Manager
+                To-Do App
             </h1>
 
             <div className='create-form'>
