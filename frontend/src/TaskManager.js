@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import axios from 'axios';
 import { 
     BsCircleFill as CircleIcon, 
     BsFillCheckCircleFill as CheckIcon, 
     BsFillTrashFill as TrashIcon, 
     BsPencilFill as EditIcon
 } from 'react-icons/bs';
-import { getTasks, addTask as addTaskAPI, toggleTask, updateTask, deleteTask as deleteTaskAPI } from './api';
 
 const TaskManager = () => {
     const [taskInput, setTaskInput] = useState('');
@@ -15,20 +15,20 @@ const TaskManager = () => {
     const [editTaskId, setEditTaskId] = useState('');
 
     useEffect(() => {
-        getTasks()
-            .then(data => setTaskList(data))
+        axios.get('http://localhost:5003/get')
+            .then(response => setTaskList(response.data))
             .catch(error => console.log(error));
     }, []);
 
     const addTask = () => {
         const trimmedTask = taskInput.trim();
         if (!trimmedTask) return;
-        addTaskAPI(trimmedTask)
-            .then(() => {
+        axios.post('http://localhost:5003/add', { task: trimmedTask })
+            .then(response => {
+                console.log(response.data);
+                window.location.reload();
                 setTaskInput('');
-                return getTasks();
             })
-            .then(data => setTaskList(data))
             .catch(error => console.log(error));
     };
 
@@ -38,8 +38,9 @@ const TaskManager = () => {
             : "Mark this task as complete?";
 
         if (window.confirm(confirmation)) {
-            toggleTask(id)
-                .then(() => {
+            axios.put(`http://localhost:5003/edit/${id}`)
+                .then(response => {
+                    console.log(response.data);
                     const updatedList = taskList.map(item =>
                         item._id === id ? { ...item, done: !item.done } : item
                     );
@@ -50,21 +51,24 @@ const TaskManager = () => {
     };
 
     const saveEdit = (id, newTask) => {
-        updateTask(id, newTask)
-            .then(() => {
+        axios.put(`http://localhost:5003/update/${id}`, { task: newTask })
+            .then(response => {
+                console.log(response.data);
                 const updatedList = taskList.map(item =>
                     item._id === id ? { ...item, task: newTask } : item
                 );
                 setTaskList(updatedList);
                 setEditTaskId('');
                 setEditInput('');
+                window.location.reload();
             })
             .catch(error => console.log(error));
     };
 
     const deleteTask = (id) => {
-        deleteTaskAPI(id)
-            .then(() => {
+        axios.delete(`http://localhost:5003/delete/${id}`)
+            .then(response => {
+                console.log(response.data);
                 const updatedList = taskList.filter(item => item._id !== id);
                 setTaskList(updatedList);
             })
