@@ -8,6 +8,8 @@ import {
     BsPencilFill as EditIcon
 } from 'react-icons/bs';
 
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+
 const TaskManager = () => {
     const [taskInput, setTaskInput] = useState('');
     const [taskList, setTaskList] = useState([]);
@@ -15,7 +17,7 @@ const TaskManager = () => {
     const [editTaskId, setEditTaskId] = useState('');
 
     useEffect(() => {
-        axios.get('http://localhost:5003/get')
+        axios.get(`${BACKEND_URL}/get`)
             .then(response => setTaskList(response.data))
             .catch(error => console.log(error));
     }, []);
@@ -23,7 +25,7 @@ const TaskManager = () => {
     const addTask = () => {
         const trimmedTask = taskInput.trim();
         if (!trimmedTask) return;
-        axios.post('http://localhost:5003/add', { task: trimmedTask })
+        axios.post(`${BACKEND_URL}/add`, { task: trimmedTask })
             .then(response => {
                 console.log(response.data);
                 window.location.reload();
@@ -38,7 +40,7 @@ const TaskManager = () => {
             : "Mark this task as complete?";
 
         if (window.confirm(confirmation)) {
-            axios.put(`http://localhost:5003/edit/${id}`)
+            axios.put(`${BACKEND_URL}/edit/${id}`)
                 .then(response => {
                     console.log(response.data);
                     const updatedList = taskList.map(item =>
@@ -51,7 +53,7 @@ const TaskManager = () => {
     };
 
     const saveEdit = (id, newTask) => {
-        axios.put(`http://localhost:5003/update/${id}`, { task: newTask })
+        axios.put(`${BACKEND_URL}/update/${id}`, { task: newTask })
             .then(response => {
                 console.log(response.data);
                 const updatedList = taskList.map(item =>
@@ -66,7 +68,7 @@ const TaskManager = () => {
     };
 
     const deleteTask = (id) => {
-        axios.delete(`http://localhost:5003/delete/${id}`)
+        axios.delete(`${BACKEND_URL}/delete/${id}`)
             .then(response => {
                 console.log(response.data);
                 const updatedList = taskList.filter(item => item._id !== id);
